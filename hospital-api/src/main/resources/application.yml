@@ -1,0 +1,117 @@
+server:
+  jetty:
+    threads:
+      acceptors: 4
+      selectors: 8
+      min: 8
+      max: 200
+  port: 8092
+  servlet:
+    context-path: /hospital-api
+  ssl:
+    key-store: classpath:hiton.fun.pfx
+    key-store-password: 7hpku2dnr9775oa
+    key-store-type: PKCS12
+#    key-alias: crap.eu.org
+
+spring:
+  datasource:
+    driver-class-name: org.apache.phoenix.queryserver.client.Driver
+    url: jdbc:phoenix:thin:url=http://43.136.28.226:8765;serialization=PROTOBUF
+    type: com.alibaba.druid.pool.DruidDataSource
+    druid:
+      test-on-borrow: true
+      test-while-idle: true
+      max-active: 8
+      min-idle: 4
+      validation-query: SELECT 1
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 20MB
+      max-request-size: 20MB
+
+  redis:
+    database: 0
+    host: 43.136.28.226
+    port: 6379
+    password: abc123456
+    jedis:
+      pool:
+        max-active: 1000
+        max-wait: -1ms
+        max-idle: 16
+        min-idle: 8
+
+  quartz:
+    job-store-type: memory
+  rabbitmq:
+    host: 43.136.28.226
+    port: 5672
+    username: guest
+    password: guest
+
+mybatis:
+  mapper-locations: classpath*:mapper/*.xml
+  type-aliases-package: com.example.hospital.api.db.pojo
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    map-underscore-to-camel-case: true
+
+logging:
+  level:
+    root: info
+    com.example.hospital.api.db.dao: warn
+  pattern:
+    console: "%d{yyyy/MM/dd HH:mm:ss}  %-5level  %msg%n"
+
+sa-token:
+  token-name: token
+  timeout: 2592000
+  activity-timeout: -1
+  allow-concurrent-login: true
+  is-share: false
+  token-style: uuid
+  #已经从请求头中获取token了 不必从cookie里面读了
+  isReadCookie: false
+
+
+
+tencent:
+  cloud:
+    appId: 1313142463
+    secretId: AKIDmQH6oLn6uqsvqaQ8LNI7qW1TxQhkrvtm
+    secretKey: 2GQdSLMdhppbEvYxuww7Kh7d6V2minld
+    face:
+      groupName: hospital
+      region: ap-beijing
+  trtc:
+    appId: 1600031730
+    secretKey: 7ed71c276adafb440a1378703cbaabc0e815138689f6639861313852b9fcd67d
+    expire: 86400
+
+
+minio:
+  endpoint: http://43.136.28.226:9001
+  access-key: root
+  secret-key: abc123456
+
+
+knife4j:
+  enable: true
+  openapi:
+    title: hospital-api接口文档
+    description: ""
+    email:
+    concat:
+    url:
+    version: v1.0
+    license:
+    license-url:
+    terms-of-service-url:
+    group:
+      test1:
+        group-name: hospital-api-group
+        api-rule: package
+        api-rule-resources:
+          - com.example.hospital.api.controller

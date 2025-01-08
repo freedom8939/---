@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.hospital.api.db.dao.VideoDiagnoseDao">
+    <update id="updateStatus" parameterType="HashMap">
+        upsert into hospital.video_diagnose(
+        "id","status"
+        <if test="realStart!=null">
+            ,"real_start"
+        </if>
+        <if test="realEnd!=null">
+            ,"real_end"
+        </if>
+        )values (
+        ${id},${status}
+        <if test="realStart!=null">
+            ,TO_DATE('${realStart}')
+        </if>
+        <if test="realEnd!=null">
+            ,TO_DATE('${realEnd}')
+        </if>
+        )
+    </update>
+
+    <select id="searchPaymentStatus" parameterType="int" resultType="HashMap">
+        SELECT "doctor_id"      AS "doctorId",
+               "payment_status" AS "paymentStatus"
+        FROM HOSPITAL.VIDEO_DIAGNOSE
+        WHERE "id" = ${id}
+    </select>
+
+    <!--关闭挂号单-->
+    <update id="closePayment" parameterType="Map">
+        UPSERT
+        INTO HOSPITAL.VIDEO_DIAGNOSE("id","payment_status")
+        SELECT "id", 3
+        FROM HOSPITAL.VIDEO_DIAGNOSE
+        WHERE "payment_status" = 1
+        <if test="id!=null">
+            AND "id" = ${id}
+        </if>
+        <if test="timer!=null">
+            AND (NOW()-"create_time") &gt;=0.00695
+        </if>
+    </update>
+
+    <select id="searchVideoDiagnoseInfo" parameterType="int" resultType="HashMap">
+        SELECT vd."id"                                           AS "diagnoseId",
+               pc."name"                                         AS "name",
+               pc."tel"                                          AS "tel",
+               pu."photo"                                        AS "photo",
+               TO_CHAR(vd."expect_start", 'yyyy-MM-dd HH:mm:ss') AS "expectStart",
+               TO_CHAR(vd."expect_end", 'yyyy-MM-dd HH:mm:ss')   AS "expectEnd",
+               vd."status"                                       AS "status"
+        FROM HOSPITAL.VIDEO_DIAGNOSE vd
+                 JOIN HOSPITAL.PATIENT_USER_INFO_CARD pc
+                      ON vd."patient_card_id" = pc."id"
+                 JOIN HOSPITAL.PATIENT_USER pu ON pc."user_id" = pu."id"
+        WHERE vd."id" = ${diagnoseId}
+    </select>
+
+</mapper>
